@@ -70,5 +70,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, observerOptions);
 
+  // Bot-proof Email Protection (Obfuscation)
+  const emailShields = document.querySelectorAll('.email-shield');
+  emailShields.forEach(link => {
+    const u = link.getAttribute('data-u');
+    const d = link.getAttribute('data-d');
+    if (!u || !d) return;
+
+    const email = `${u}@${d}`;
+
+    const reveal = () => {
+      link.setAttribute('href', `mailto:${email}`);
+      const textSpan = link.querySelector('.email-placeholder');
+      if (textSpan && link.getAttribute('data-show-text') === 'true') {
+        textSpan.textContent = email;
+      }
+    };
+
+    // Reveal only upon human interaction (mouse enter, touch, or keyboard focus)
+    link.addEventListener('mouseenter', reveal, { once: true });
+    link.addEventListener('focus', reveal, { once: true });
+    link.addEventListener('touchstart', reveal, { once: true, passive: true });
+    link.addEventListener('click', (e) => {
+      reveal();
+      if (link.getAttribute('href') === '#') {
+        e.preventDefault();
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  });
+
   sections.forEach(section => observer.observe(section));
 });
